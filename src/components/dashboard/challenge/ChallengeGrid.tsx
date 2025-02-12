@@ -78,7 +78,7 @@ export function ChallengeGrid({ userId, categoryScores }: ChallengeGridProps) {
   }
   
   return (
-    <div  id="challenges" className="space-y-4">
+    <div  id="challenges" className="space-y-4 scroll-mt-20">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-bold text-white">Challenges</h2>
         <div className="flex items-center gap-4">

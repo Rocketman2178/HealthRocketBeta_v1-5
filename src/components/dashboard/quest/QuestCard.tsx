@@ -51,7 +51,7 @@ export function QuestCard({
   }
 
   return (
-    <div id="quests" className="relative mt-4">
+    <div id="quests" className="relative mt-4 scroll-mt-20">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-bold text-white">Quests</h2>
         <div className="flex items-center gap-4">

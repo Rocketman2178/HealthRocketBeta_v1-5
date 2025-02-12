@@ -186,7 +186,7 @@ export function CosmoModal() {
                               <button
                                 onClick={() => {
                                   // Use the scroll_target from the recommendation
-                                  scrollToSection(rec.scroll_target, 'center');
+                                  scrollToSection(rec.scroll_target, 'start');
                                   if (rec.action === 'openChallengeLibrary') {
                                     // Trigger challenge library to open
                                     window.dispatchEvent(new CustomEvent('openChallengeLibrary'));

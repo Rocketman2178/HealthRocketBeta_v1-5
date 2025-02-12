@@ -130,21 +130,21 @@ export function CoreDashboard() {
               <Trophy size={18} />
             </button>
             <button
-              onClick={() => scrollToSection('quests', 'center')}
+              onClick={() => scrollToSection('quests', 'start')}
               className="flex items-center justify-center w-10 h-10 border border-orange-500/50 text-orange-500 rounded-full bg-black/20 backdrop-blur-sm hover:bg-orange-500 hover:text-white transition-colors shadow-lg"
               title="Quests"
             >
               <Compass size={18} />
             </button>
             <button
-              onClick={() => scrollToSection('challenges', 'center')}
+              onClick={() => scrollToSection('challenges', 'start')}
               className="flex items-center justify-center w-10 h-10 border border-orange-500/50 text-orange-500 rounded-full bg-black/20 backdrop-blur-sm hover:bg-orange-500 hover:text-white transition-colors shadow-lg"
               title="Challenges"
             >
               <Target size={18} />
             </button>
             <button
-              onClick={() => scrollToSection('boosts', 'center')}
+              onClick={() => scrollToSection('boosts', 'start')}
               className="flex items-center justify-center w-10 h-10 border border-orange-500/50 text-orange-500 rounded-full bg-black/20 backdrop-blur-sm hover:bg-orange-500 hover:text-white transition-colors shadow-lg"
               title="Boosts"
             >

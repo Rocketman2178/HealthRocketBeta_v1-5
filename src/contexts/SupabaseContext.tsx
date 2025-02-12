@@ -53,7 +53,6 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       }
     }, 30000); // Check every 30 seconds
 
-    return () => clearInterval(checkConnection);
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -65,7 +64,9 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {subscription.unsubscribe();
+      clearInterval(checkConnection);
+    };
   }, []);
 
   const value = {

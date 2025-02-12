@@ -80,7 +80,7 @@ export function ChallengeDetails({
                 )}
                 <div className="flex items-center gap-2">
                   <Calendar size={14} className="text-orange-500" />
-                  <span className="text-xs text-gray-400">{challenge.duration} Days</span>
+                  <span className="text-xs text-gray-400">{isAlreadyActive?challenge.duration:"X"} Days</span>
                 </div>
               </div>
             </div>
@@ -224,7 +224,7 @@ export function ChallengeDetails({
                           <span className="text-orange-500">
                             {req.description.match(/(\d+)% of score/)?.[1]}%
                           </span>
-                          <span> of score)</span>
+                          <span> of score</span>
                         </>
                       )}
                     </span>

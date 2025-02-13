@@ -115,6 +115,7 @@ export function ChallengeGrid({ userId, categoryScores }: ChallengeGridProps) {
               
               return (
                 <ChallengeCard
+                  userId={userId}
                   key={`${challenge.id}-${challenge.name}`}
                   challenge={enrichedChallenge}
                   activeQuest={activeQuestDetails}

@@ -11,7 +11,7 @@ interface DailyBoostsProps {
   selectedBoosts: BoostState[] | [];
   weeklyBoosts: BoostState[] | [];
   daysUntilReset: number;
-  onCompleteBoost?: (id: string) => Promise<void>;
+  onCompleteBoost?: (id: string,boostCategory:string) => Promise<void>;
 }
 
 export function DailyBoosts({ 

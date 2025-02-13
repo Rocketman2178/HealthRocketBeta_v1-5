@@ -63,6 +63,7 @@ The top 10% performer(s) share 75% of the available reward pool, which could mea
         'Top 10% share 75% of prize pool, top 50% get entry fee back'
       ]
     },
+    relatedCategories:["Sleep"],
     successMetrics: [
       'Daily verification posts (0/21)',
       'Daily Sleep boosts (0/21)',

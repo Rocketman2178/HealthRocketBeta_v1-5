@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 interface BoostItemProps {
   id: string;
+  boostCategory:string;
   name: string;
   estimatedTime?: string;
   expertReference?: {
@@ -21,12 +22,13 @@ interface BoostItemProps {
   isPreviousDay: boolean;
   isLocked: boolean;
   isDisabled: boolean;
-  onComplete?: (id: string) => Promise<void>;
+  onComplete?: (id: string,boostCategory:string) => Promise<void>;
   boostsRemaining:number;
 }
 
 export function BoostItem({ 
   id, 
+  boostCategory,
   name, 
   estimatedTime,
   expertReference,
@@ -53,7 +55,7 @@ export function BoostItem({
   const handleCheckClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isLocked && !isCompletedThisWeek && !isDisabled && onComplete && boostsRemaining >0) {
-      onComplete(id).catch(err => {
+      onComplete(id,boostCategory).catch(err => {
         console.error('Error completing boost:', err);
       });
     }

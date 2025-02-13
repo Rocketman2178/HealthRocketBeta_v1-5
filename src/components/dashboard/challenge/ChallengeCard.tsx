@@ -12,20 +12,21 @@ import type { Challenge, Quest } from '../../../types/dashboard';
 import { supabase } from '../../../lib/supabase';
 
 interface ChallengeCardProps {
+  userId:string|undefined;
   challenge: Challenge;
   activeQuest?: Quest | null;
   onCancel?: (id: string) => void;
 }
 
-export function ChallengeCard({ challenge, activeQuest, onCancel }: ChallengeCardProps) {
+export function ChallengeCard({ userId,challenge, activeQuest, onCancel }: ChallengeCardProps) {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [playerCount, setPlayerCount] = useState<number>(0);
+  const [boostCount,setBoostCount] = useState<number>(challenge?.boostCount||0);
+  const [iseDailyCompleted,setIsDailyCompleted] = useState<boolean>(challenge?.isDailyCompleted||false);
   const navigate = useNavigate();
-
   const isPremiumChallenge = challenge.isPremium;
   const startDate = challenge.startDate ? new Date(challenge.startDate) : null;
   const hasStarted = startDate ? startDate <= new Date() : true;
-  
   // Get appropriate days display text
   const getDaysDisplay = () => {
     if (isPremiumChallenge && startDate && !hasStarted) {
@@ -35,6 +36,91 @@ export function ChallengeCard({ challenge, activeQuest, onCancel }: ChallengeCar
     }
     return `${challenge.daysRemaining} Days Left`;
   };
+
+  const incrementBoost = async () => {
+    try {
+      const { data, error: dbError } = await supabase
+        .from("challenges")
+        .select("boost_count")
+        .eq("user_id", userId)
+        .eq("challenge_id", challenge.challenge_id)
+        .maybeSingle();
+  
+      if (dbError) {
+        console.error("Error fetching challenge:", dbError);
+        return;
+      }
+  
+      if (!data) {
+        console.warn("Challenge not found for the given user and challenge ID.");
+        return;
+      }
+  
+      const currentBoostCount = data.boost_count ?? 0; 
+  
+      const {error } = await supabase
+        .from("challenges")
+        .update({ boost_count: currentBoostCount +1 , daily_completed: true })
+        .eq("user_id", userId)
+        .eq("challenge_id", challenge.challenge_id)
+  
+      if (error) {
+        console.error("Error updating challenge:", error);
+        return;
+      }
+      setBoostCount(currentBoostCount+1);
+      setIsDailyCompleted(true);
+    } catch (err) {
+      console.error("Unexpected error in incrementBoost:", err);
+    }
+  };
+  
+  useEffect(() => {
+    const NewYorkTimeZone = 'America/New_York';
+    const resetDailyCompleted = async () => {
+      if (!userId) return;
+      await supabase.from("challenges")
+      .update({ daily_completed: false })
+      .eq("user_id", userId)
+      .eq("challenge_id", challenge.challenge_id)
+    };
+  
+    const scheduleReset = () => {
+      const now = new Date();
+      const newYorkTime = formatInTimeZone(now, NewYorkTimeZone, 'yyyy-MM-dd HH:mm:ssXXX');
+      const midnight = new Date(newYorkTime);
+      midnight.setHours(24, 0, 0, 0);
+      const timeUntilMidnight = midnight.getTime() - now.getTime() + 60 * 1000; 
+      const timeoutId = setTimeout(async () => {
+        await resetDailyCompleted();
+        scheduleReset(); 
+      }, timeUntilMidnight);
+  
+      return timeoutId;
+    };
+    const timeoutId = scheduleReset();
+    return () => clearTimeout(timeoutId);
+  }, []); 
+
+  useEffect(() => {
+    const handleDashboardUpdate = async () => {
+      try {
+        if(!iseDailyCompleted)
+        await Promise.all([incrementBoost()]);
+      } catch (err) {
+        console.error("Error updating dashboard:", err);
+      }
+    };
+
+    const handleUpdate = (event: Event) => {
+      if (event instanceof CustomEvent && event.detail?.updatedPart ==="boost" && challenge?.relatedCategories?.includes(event?.detail?.category) && event.type === "dashboardUpdate" ) {
+        handleDashboardUpdate();
+      }
+    };
+
+    window.addEventListener("dashboardUpdate", handleUpdate);
+    return () => window.removeEventListener("dashboardUpdate", handleUpdate);
+  }, [incrementBoost]);
 
   // Fetch active players
   useEffect(() => {
@@ -149,7 +235,7 @@ export function ChallengeCard({ challenge, activeQuest, onCancel }: ChallengeCar
                 {challenge.isPremium ? (
                   <div className="flex items-center gap-2">
                     <span className="text-gray-400">Boosts</span>
-                    <span className="text-orange-500">0/21</span>
+                    <span className="text-orange-500">{boostCount}/21</span>
                   </div>
                 ) : (
                   <span className="text-gray-400">Progress</span>

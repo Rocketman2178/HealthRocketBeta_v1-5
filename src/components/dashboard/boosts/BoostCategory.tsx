@@ -13,7 +13,7 @@ interface BoostCategoryProps {
   selectedBoosts: BoostState[] | [];
   weeklyBoosts: BoostState[] | [];
   boostsRemaining: number;
-  onComplete?: (id: string) => void;
+  onComplete?: (id: string,boostCategory:string) => void;
 }
 
 export function BoostCategory({ 
@@ -105,6 +105,7 @@ export function BoostCategory({
             <BoostItem
               key={boost.id}
               id={boost.id}
+              boostCategory={boost?.category}
               estimatedTime={boost.estimatedTime}
               expertReference={boost.expertReference}
               instructions={boost.instructions}

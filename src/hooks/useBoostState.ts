@@ -172,7 +172,7 @@ export function useBoostState(userId: string | undefined) {
     return () => clearInterval(interval);
   }, [userId, weekStartDate, isLoading]);
 
-  const completeBoost = async (boostId: string) => {
+  const completeBoost = async (boostId: string,category:string) => {
     try {
       // Check if already at daily limit
       const todayCount = await getTodayBoostCount();
@@ -189,7 +189,7 @@ export function useBoostState(userId: string | undefined) {
       // Dispatch dashboard update event with FP earned
       window.dispatchEvent(
         new CustomEvent("dashboardUpdate", {
-          detail: { fpEarned: data.fp_earned },
+          detail: { fpEarned: data.fp_earned ,updatedPart:"boost",category:category},
         })
       );
 

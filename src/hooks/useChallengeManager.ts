@@ -156,6 +156,7 @@ export function useChallengeManager(userId: string | undefined) {
           challenge_id: dbChallenge.challenge_id,
           name: details.name,
           category: details.category,
+          relatedCategories:details?.relatedCategories ||[],
           description: details.description,
           expertReference: details.expertReference,
           requirements: details.requirements,
@@ -166,7 +167,9 @@ export function useChallengeManager(userId: string | undefined) {
           progress: verificationProgress,
           verification_count: dbChallenge.verification_count || 0,
           verifications_required: dbChallenge.verifications_required || 3,
-          daysRemaining: calculateDaysRemaining(dbChallenge.started_at, details.duration || 21)
+          daysRemaining: calculateDaysRemaining(dbChallenge.started_at, details.duration || 21),
+          boostCount:dbChallenge?.boost_count || 0,
+          isDailyCompleted:dbChallenge.daily_completed|| false
         };
       }).filter(Boolean) as Challenge[];
 

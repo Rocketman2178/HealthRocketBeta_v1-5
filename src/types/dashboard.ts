@@ -54,7 +54,9 @@ export interface Quest {
 export interface Challenge {
   id: string;
   name: string;
+  challenge_id:string;
   category: string;
+  relatedCategories:string[];
   description: string;
   learningObjectives?: string[];
   requirements: Array<string | { description: string; verificationMethod?: string }>;
@@ -68,6 +70,8 @@ export interface Challenge {
     week3: string;
   };
   progress: number;
+  boostCount:number;
+  isDailyCompleted:boolean;
   duration: number;
   daysRemaining: number;
   fuelPoints: number;

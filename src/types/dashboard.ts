@@ -71,7 +71,7 @@ export interface Challenge {
   };
   progress: number;
   boostCount:number;
-  isDailyCompleted:boolean;
+  last_daily_boost_completed_date:string;
   duration: number;
   daysRemaining: number;
   fuelPoints: number;

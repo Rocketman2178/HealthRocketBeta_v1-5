@@ -152,24 +152,24 @@ export function useChallengeManager(userId: string | undefined) {
         );
 
         return {
-          id: dbChallenge.id,
-          challenge_id: dbChallenge.challenge_id,
-          name: details.name,
-          category: details.category,
+          id: dbChallenge?.id,
+          challenge_id: dbChallenge?.challenge_id,
+          name: details?.name,
+          category: details?.category,
           relatedCategories:details?.relatedCategories ||[],
-          description: details.description,
-          expertReference: details.expertReference,
-          requirements: details.requirements,
-          verificationMethod: details.verificationMethod,
-          expertTips: details.expertTips,
-          fuelPoints: details.fuelPoints,
-          duration: details.duration,
+          description: details?.description,
+          expertReference: details?.expertReference,
+          requirements: details?.requirements,
+          verificationMethod: details?.verificationMethod,
+          expertTips: details?.expertTips,
+          fuelPoints: details?.fuelPoints,
+          duration: details?.duration,
           progress: verificationProgress,
           verification_count: dbChallenge.verification_count || 0,
           verifications_required: dbChallenge.verifications_required || 3,
           daysRemaining: calculateDaysRemaining(dbChallenge.started_at, details.duration || 21),
           boostCount:dbChallenge?.boost_count || 0,
-          isDailyCompleted:dbChallenge.daily_completed|| false
+          last_daily_boost_completed_date:dbChallenge?.last_daily_boost_completed_date
         };
       }).filter(Boolean) as Challenge[];
 

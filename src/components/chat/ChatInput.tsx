@@ -5,7 +5,7 @@ import React, {
   Dispatch,
   SetStateAction,
 } from "react";
-import { Send, Image as ImageIcon, X, Check, DoorClosed, FolderClosedIcon, PanelTopClose, XIcon } from "lucide-react";
+import { Send, Image as ImageIcon, X, Check, XIcon } from "lucide-react";
 import { ChatMessage } from "../../types/chat";
 interface ChatInputProps {
   onSend: (content: string, mediaFile?: File) => void;

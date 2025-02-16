@@ -9,6 +9,7 @@ import { CompletedChallengesModal } from './CompletedChallengesModal';
 import { useChallengeManager } from '../../../hooks/useChallengeManager';
 import { useCompletedActivities } from '../../../hooks/useCompletedActivities';
 import { quests } from '../../../data';
+import { Quest } from '../../../types/game';
 
 interface ChallengeGridProps {
   userId: string | undefined;

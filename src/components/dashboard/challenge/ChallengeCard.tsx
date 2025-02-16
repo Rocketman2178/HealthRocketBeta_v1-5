@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Award, Zap, Ban, Users, CheckCircle2, Clock } from 'lucide-react';
+import { Award, Zap, Ban, Users, CheckCircle2 } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { getChatPath } from '../../../lib/utils/chat';
 import { Card } from '../../ui/card';
@@ -22,7 +22,7 @@ export function ChallengeCard({ userId,challenge, activeQuest, onCancel }: Chall
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [playerCount, setPlayerCount] = useState<number>(0);
   const [boostCount,setBoostCount] = useState<number>(challenge?.boostCount||0);
-  const [iseDailyCompleted,setIsDailyCompleted] = useState<boolean>(challenge?.isDailyCompleted||false);
+  const [DailyCompletedDate,setDailyCompletedDate] = useState<string>(challenge?.last_daily_boost_completed_date);
   const navigate = useNavigate();
   const isPremiumChallenge = challenge.isPremium;
   const startDate = challenge.startDate ? new Date(challenge.startDate) : null;
@@ -36,7 +36,7 @@ export function ChallengeCard({ userId,challenge, activeQuest, onCancel }: Chall
     }
     return `${challenge.daysRemaining} Days Left`;
   };
-
+  const NewYorkTimeZone = 'America/New_York';
   const incrementBoost = async () => {
     try {
       const { data, error: dbError } = await supabase
@@ -57,56 +57,35 @@ export function ChallengeCard({ userId,challenge, activeQuest, onCancel }: Chall
       }
   
       const currentBoostCount = data.boost_count ?? 0; 
-  
+     
+      const now = new Date();
+      const newYorkTime = formatInTimeZone(now, NewYorkTimeZone, 'yyyy-MM-dd');
       const {error } = await supabase
         .from("challenges")
-        .update({ boost_count: currentBoostCount +1 , daily_completed: true })
+        .update({ boost_count: currentBoostCount +1 , last_daily_boost_completed_date: newYorkTime })
         .eq("user_id", userId)
         .eq("challenge_id", challenge.challenge_id)
-  
       if (error) {
         console.error("Error updating challenge:", error);
         return;
       }
       setBoostCount(currentBoostCount+1);
-      setIsDailyCompleted(true);
+      setDailyCompletedDate(newYorkTime);
     } catch (err) {
       console.error("Unexpected error in incrementBoost:", err);
     }
   };
-  
-  useEffect(() => {
-    const NewYorkTimeZone = 'America/New_York';
-    const resetDailyCompleted = async () => {
-      if (!userId) return;
-      await supabase.from("challenges")
-      .update({ daily_completed: false })
-      .eq("user_id", userId)
-      .eq("challenge_id", challenge.challenge_id)
-    };
-  
-    const scheduleReset = () => {
-      const now = new Date();
-      const newYorkTime = formatInTimeZone(now, NewYorkTimeZone, 'yyyy-MM-dd HH:mm:ssXXX');
-      const midnight = new Date(newYorkTime);
-      midnight.setHours(24, 0, 0, 0);
-      const timeUntilMidnight = midnight.getTime() - now.getTime() + 60 * 1000; 
-      const timeoutId = setTimeout(async () => {
-        await resetDailyCompleted();
-        scheduleReset(); 
-      }, timeUntilMidnight);
-  
-      return timeoutId;
-    };
-    const timeoutId = scheduleReset();
-    return () => clearTimeout(timeoutId);
-  }, []); 
+
 
   useEffect(() => {
     const handleDashboardUpdate = async () => {
       try {
-        if(!iseDailyCompleted)
-        await Promise.all([incrementBoost()]);
+        const now = new Date();
+        const newYorkTime = formatInTimeZone(now, NewYorkTimeZone, 'yyyy-MM-dd');
+        if(DailyCompletedDate !== newYorkTime){
+
+          await Promise.all([incrementBoost()]);
+        }
       } catch (err) {
         console.error("Error updating dashboard:", err);
       }

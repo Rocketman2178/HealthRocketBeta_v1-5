@@ -5,6 +5,7 @@ import { signIn, signUp, signOut, resetPassword, updatePassword } from '../lib/s
 
 interface SupabaseContextType {
   user: User | null;
+  session:string;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
@@ -17,6 +18,7 @@ const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session,setSession] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
 
@@ -32,6 +34,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
+          setSession(session?.access_token)
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -71,6 +74,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
+    session,
     loading,
     signIn,
     signUp,

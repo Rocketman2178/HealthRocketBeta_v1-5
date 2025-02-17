@@ -81,7 +81,7 @@ serve(async (req) => {
     })
 
     return new Response(
-      JSON.stringify({ sessionId: session.id }),
+      JSON.stringify({ sessionId: session.id ,sessionUrl:session.url}),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

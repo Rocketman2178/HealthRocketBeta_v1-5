@@ -34,7 +34,7 @@ serve(async (req) => {
     if (userError || !user) throw new Error('Invalid user')
 
     // Get the price ID from the request
-    const { priceId } = await req.json()
+    const { priceId ,trialDays} = await req.json()
     if (!priceId) throw new Error('Price ID is required')
 
     // Get or create Stripe customer
@@ -76,6 +76,9 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
+      subscription_data: {
+        trial_period_days: trialDays ?? 0, // Add trial days
+      },
       success_url: `${req.headers.get('origin')}/settings?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/settings`,
     })

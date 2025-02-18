@@ -1,8 +1,12 @@
 import { useEffect } from "react";
 import { useSupabase } from "../../contexts/SupabaseContext";
-
-export default function StripeCheckoutModal({ priceId, onClose }: { priceId: string | undefined; onClose: () => void }) {
-  const { session: token } = useSupabase();
+interface StripeCheckoutModalProps {
+  priceId:string;
+  trialDays:number;
+   onClose:()=>void
+}
+export default function StripeCheckoutModal({priceId,trialDays=0, onClose }:StripeCheckoutModalProps ) {
+  const {session:token} = useSupabase();
   const handleSubscribe = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-subscription`, {
@@ -11,7 +15,7 @@ export default function StripeCheckoutModal({ priceId, onClose }: { priceId: str
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId ,trialDays}),
       });
 
       if (!response.ok) {
@@ -31,10 +35,10 @@ export default function StripeCheckoutModal({ priceId, onClose }: { priceId: str
   };
 
   useEffect(() => {
-    if (priceId) {
+    if (priceId && token) {
       handleSubscribe();
     }
-  }, [priceId]);
+  }, [priceId,token]);
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm">

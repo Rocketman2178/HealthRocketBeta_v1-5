@@ -61,8 +61,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user);
+        setSession(session?.access_token)
       } else {
         setUser(null);
+        setSession(null);
       }
       setLoading(false);
     });

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
 import {
   Shield,
   ChevronDown,
@@ -19,9 +19,14 @@ interface Plan {
   icon: LucideIcon,
   description: string;
   prizeEligible: boolean,
+  trialDays:number;
 
 }
-export function SubscriptionPlan({ onOpenChange }) {
+interface SubscriptionPlanProps {
+  onOpenChange: Dispatch<SetStateAction<boolean>>
+}
+
+export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [paymentModal, setPaymentModal] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,11 +34,12 @@ export function SubscriptionPlan({ onOpenChange }) {
   const plans = [
     {
       name: "Free Plan",
-      price: "$0/month",
+      price: "$0/month", 
       priceId:"price_1Qt7haHPnFqUVCZdl33y9bET",
       icon: Rocket,
       description: "Start your health optimization journey",
       prizeEligible: false,
+      trialDays:0
     },
     {
       name: "Pro Plan",
@@ -42,6 +48,7 @@ export function SubscriptionPlan({ onOpenChange }) {
       icon: Shield,
       description: "Level up with prizes and premium features",
       prizeEligible: true,
+      trialDays:60
     },
     {
       name: "Pro + Family",
@@ -51,6 +58,7 @@ export function SubscriptionPlan({ onOpenChange }) {
       icon: Users,
       description: "Gamify health for your entire family",
       prizeEligible: true,
+      trialDays:60
     },
     {
       name: "Pro + Team",
@@ -60,6 +68,7 @@ export function SubscriptionPlan({ onOpenChange }) {
       icon: Building2,
       description: "Optimize and gamify health for your entire team",
       prizeEligible: true,
+      trialDays:60
     },
   ];
   useEffect(() => {
@@ -193,7 +202,7 @@ export function SubscriptionPlan({ onOpenChange }) {
           </div>
         )}
       </div>
-      {paymentModal && <StripeCheckoutModal priceId={currentPlan?.priceId} onClose={() => setPaymentModal(false)} />}
+      {paymentModal && <StripeCheckoutModal  priceId={currentPlan?.priceId} trialDays={currentPlan?.trialDays} onClose={() => setPaymentModal(false)} />}
     </>
   );
 }

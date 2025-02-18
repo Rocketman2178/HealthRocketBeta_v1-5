@@ -87,4 +87,6 @@ export async function signUp(email: string, password: string, name: string) {
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
+  localStorage.clear();
+  sessionStorage.clear();
 }

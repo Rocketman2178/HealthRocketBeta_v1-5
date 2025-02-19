@@ -34,7 +34,7 @@ serve(async (req) => {
     if (userError || !user) throw new Error('Invalid user')
 
     // Get the price ID from the request
-    const { priceId ,trialDays} = await req.json()
+    const { priceId ,trialDays,  promoCode} = await req.json()
     if (!priceId) throw new Error('Price ID is required')
 
     // Get or create Stripe customer
@@ -65,7 +65,7 @@ serve(async (req) => {
 
       customerId = customer.id
     }
-
+    
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -75,10 +75,9 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
+      ...(promoCode && {allow_promotion_codes: true}),
       mode: 'subscription',
-      ...(trialDays > 0 && { 
-        subscription_data: { trial_period_days: trialDays } 
-      }),
+      ...(trialDays > 0 && { subscription_data: { trial_period_days: trialDays } }),
       success_url: `${req.headers.get('origin')}/settings?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/settings`,
     })

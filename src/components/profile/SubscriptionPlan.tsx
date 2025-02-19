@@ -15,65 +15,70 @@ import StripeCheckoutModal from "../stripe/StripeCheckout";
 interface Plan {
   name: string;
   price: string;
-  priceId:string;
-  icon: LucideIcon,
+  priceId: string;
+  icon: LucideIcon;
   description: string;
-  prizeEligible: boolean,
-  trialDays:number;
-
+  prizeEligible: boolean;
+  trialDays: number;
+  promoCode:boolean;
 }
 interface SubscriptionPlanProps {
-  onOpenChange: Dispatch<SetStateAction<boolean>>
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
 }
 
-export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
+export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [paymentModal, setPaymentModal] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
- 
+
   const plans = [
     {
       name: "Free Plan",
-      price: "$0/month", 
-      priceId:"price_1Qt7haHPnFqUVCZdl33y9bET",
+      price: "$0/month",
+      priceId: "price_1Qt7haHPnFqUVCZdl33y9bET",
       comingSoon: false,
       icon: Rocket,
       description: "Start your health optimization journey",
       prizeEligible: false,
-      trialDays:0
+      trialDays: 0,
+      promoCode: false
     },
     {
       name: "Pro Plan",
       price: "$59.95/month",
-      priceId:"price_1Qt7jVHPnFqUVCZdutw3mSWN",
+      priceId: "price_1Qt7jVHPnFqUVCZdutw3mSWN",
       comingSoon: false,
       icon: Shield,
       description: "Level up with prizes and premium features",
       prizeEligible: true,
-      trialDays:60
+      trialDays: 60,
+      promoCode:false
+
     },
     {
       name: "Pro + Family",
       price: "$89.95/month",
-      priceId:"price_1Qt7lXHPnFqUVCZdlpS1vrfs",
+      priceId: "price_1Qt7lXHPnFqUVCZdlpS1vrfs",
       comingSoon: true,
       icon: Users,
       description: "Gamify health for your entire family",
       prizeEligible: true,
-      trialDays:0
+      trialDays: 0,
+      promoCode:true
     },
     {
       name: "Pro + Team",
       price: "$149.95/month",
-      priceId:"price_1Qt7mVHPnFqUVCZdqvWROuTD", 
+      priceId: "price_1Qt7mVHPnFqUVCZdqvWROuTD",
       comingSoon: true,
       icon: Building2,
       description: "Optimize and gamify health for your entire team",
       prizeEligible: true,
-      trialDays:0
+      trialDays: 0,
+      promoCode:true
     },
   ];
-  const [currentPlan, setCurrentPlan] = useState<Plan |null>(plans[1]);  
+  const [currentPlan, setCurrentPlan] = useState<Plan | null>(plans[1]);
   useEffect(() => {
     onOpenChange?.(isOpen);
   }, [isOpen, onOpenChange]);
@@ -96,11 +101,9 @@ export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
     setIsOpen(false);
   };
 
-  const handlePlanClick = (plan:Plan) => {
+  const handlePlanClick = (plan: Plan) => {
     setCurrentPlan(plan);
-    if (plan.name !== "Free Plan") {
-      setPaymentModal(true);
-    }
+    setPaymentModal(true);
     setIsOpen(false);
   };
   return (
@@ -148,7 +151,9 @@ export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
                         key={plan.name}
                         onClick={() => handlePlanClick(plan)}
                         className={`w-full px-4 py-3 text-sm text-left hover:bg-gray-700 transition-colors ${
-                          currentPlan?.name === plan.name ? "bg-gray-700/50" : ""
+                          currentPlan?.name === plan.name
+                            ? "bg-gray-700/50"
+                            : ""
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
@@ -204,7 +209,14 @@ export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
           </div>
         )}
       </div>
-      {paymentModal && <StripeCheckoutModal  priceId={currentPlan?.priceId} trialDays={currentPlan?.trialDays} onClose={() => setPaymentModal(false)} />}
+      {paymentModal && (
+        <StripeCheckoutModal
+          priceId={currentPlan?.priceId}
+          trialDays={currentPlan?.trialDays}
+          promoCode={currentPlan?.promoCode}
+          onClose={() => setPaymentModal(false)}
+        />
+      )}
     </>
   );
 }

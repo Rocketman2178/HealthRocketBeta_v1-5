@@ -30,12 +30,13 @@ export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [paymentModal, setPaymentModal] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [currentPlan, setCurrentPlan] = useState<Plan |null>(null);  
+ 
   const plans = [
     {
       name: "Free Plan",
       price: "$0/month", 
       priceId:"price_1Qt7haHPnFqUVCZdl33y9bET",
+      comingSoon: false,
       icon: Rocket,
       description: "Start your health optimization journey",
       prizeEligible: false,
@@ -45,6 +46,7 @@ export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
       name: "Pro Plan",
       price: "$59.95/month",
       priceId:"price_1Qt7jVHPnFqUVCZdutw3mSWN",
+      comingSoon: false,
       icon: Shield,
       description: "Level up with prizes and premium features",
       prizeEligible: true,
@@ -58,21 +60,21 @@ export function SubscriptionPlan({onOpenChange }:SubscriptionPlanProps) {
       icon: Users,
       description: "Gamify health for your entire family",
       prizeEligible: true,
-      trialDays:60
+      trialDays:0
     },
     {
       name: "Pro + Team",
       price: "$149.95/month",
-      priceId:"price_1Qt7mVHPnFqUVCZdqvWROuTD",
+      priceId:"price_1Qt7mVHPnFqUVCZdqvWROuTD", 
       comingSoon: true,
       icon: Building2,
       description: "Optimize and gamify health for your entire team",
       prizeEligible: true,
-      trialDays:60
+      trialDays:0
     },
   ];
+  const [currentPlan, setCurrentPlan] = useState<Plan |null>(plans[1]);  
   useEffect(() => {
-    setCurrentPlan(plans[1])
     onOpenChange?.(isOpen);
   }, [isOpen, onOpenChange]);
   useEffect(() => {

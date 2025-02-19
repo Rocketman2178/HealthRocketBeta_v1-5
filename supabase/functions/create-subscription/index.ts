@@ -76,9 +76,9 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      subscription_data: {
-        trial_period_days: trialDays ?? 0, // Add trial days
-      },
+      ...(trialDays > 0 && { 
+        subscription_data: { trial_period_days: trialDays } 
+      }),
       success_url: `${req.headers.get('origin')}/settings?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/settings`,
     })

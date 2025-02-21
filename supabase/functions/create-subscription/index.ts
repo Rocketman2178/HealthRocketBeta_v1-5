@@ -75,6 +75,7 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
+      payment_method_collection: 'if_required',
       ...(promoCode && {allow_promotion_codes: true}),
       mode: 'subscription',
       ...(trialDays > 0 && { subscription_data: { trial_period_days: trialDays } }),

@@ -12,6 +12,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import StripeCheckoutModal from "../stripe/StripeCheckout";
+import { useSupabase } from "../../contexts/SupabaseContext";
 interface Plan {
   name: string;
   price: string;
@@ -20,15 +21,21 @@ interface Plan {
   description: string;
   prizeEligible: boolean;
   trialDays: number;
-  promoCode:boolean;
+  promoCode: boolean;
 }
 interface SubscriptionPlanProps {
   onOpenChange: Dispatch<SetStateAction<boolean>>;
 }
 
 export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
+  const { session: token } = useSupabase();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentModal, setPaymentModal] = useState<boolean>(false);
+  const [activeSubscription, setActiveSubscription] = useState<string | null>(
+    null
+  );
+  const [loadingActiveSubscriptions, setLoadingActiveSubscriptions] =
+    useState<boolean>(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const plans = [
@@ -41,7 +48,7 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
       description: "Start your health optimization journey",
       prizeEligible: false,
       trialDays: 0,
-      promoCode: false
+      promoCode: false,
     },
     {
       name: "Pro Plan",
@@ -52,8 +59,7 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
       description: "Level up with prizes and premium features",
       prizeEligible: true,
       trialDays: 60,
-      promoCode:false
-
+      promoCode: false,
     },
     {
       name: "Pro + Family",
@@ -64,7 +70,7 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
       description: "Gamify health for your entire family",
       prizeEligible: true,
       trialDays: 0,
-      promoCode:true
+      promoCode: true,
     },
     {
       name: "Pro + Team",
@@ -75,10 +81,46 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
       description: "Optimize and gamify health for your entire team",
       prizeEligible: true,
       trialDays: 0,
-      promoCode:true
+      promoCode: true,
     },
   ];
   const [currentPlan, setCurrentPlan] = useState<Plan | null>(plans[1]);
+  const getUserActiveSubscriptions = async () => {
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_SUPABASE_URL
+        }/functions/v1/get-active-subscription`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || "Failed to get subscription");
+      }
+
+      const data = await response.json();
+
+      setActiveSubscription(data[0]?.plan?.id);
+      setLoadingActiveSubscriptions(false);
+    } catch (err) {
+      console.error("Error fetching subscription:", err.message);
+      setLoadingActiveSubscriptions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      getUserActiveSubscriptions();
+    }
+  }, [token]);
+
   useEffect(() => {
     onOpenChange?.(isOpen);
   }, [isOpen, onOpenChange]);
@@ -101,11 +143,51 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
     setIsOpen(false);
   };
 
-  const handlePlanClick = (plan: Plan) => {
+  const handleSubscribePlanClick = (plan: Plan) => {
+    if (activeSubscription === plan.priceId) {
+      alert("You are already subscribed to this plan.");
+      return;
+    }
     setCurrentPlan(plan);
     setPaymentModal(true);
     setIsOpen(false);
   };
+  const handleCancelSubscribePlanClick = async (plan: Plan) => {
+    if (activeSubscription !== plan.priceId) {
+      alert("You are not subscribed to this plan.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cancel-subscription`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || "Failed to cancel subscription");
+      }
+
+      setActiveSubscription(null); // Remove active subscription
+      alert("Subscription canceled successfully.");
+    } catch (err) {
+      console.error("Error canceling subscription:", err.message);
+    }
+  };
+  if (loadingActiveSubscriptions) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="relative" ref={dropdownRef}>
@@ -146,12 +228,12 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
                 <div className="max-h-[60vh] overflow-y-auto">
                   {plans.map((plan) => {
                     const Icon = plan.icon;
+                    const isSubscribed = activeSubscription === plan.priceId;
                     return (
-                      <button
+                      <div
                         key={plan.name}
-                        onClick={() => handlePlanClick(plan)}
-                        className={`w-full px-4 py-3 text-sm text-left hover:bg-gray-700 transition-colors ${
-                          currentPlan?.name === plan.name
+                        className={`w-full px-4 py-3 text-sm text-left transition-colors ${
+                          isSubscribed
                             ? "bg-gray-700/50"
                             : ""
                         }`}
@@ -188,7 +270,27 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
                             <span>Eligible for Prize Pool Rewards</span>
                           </div>
                         )}
-                      </button>
+                        <div className="flex items-center justify-end gap-4">
+                          {!isSubscribed && (
+                            <button
+                              onClick={() => handleSubscribePlanClick(plan)}
+                              className="p-2 rounded-md border-2 border-orange-400 text-green-400 text-md font-bold"
+                            >
+                              Subscribe
+                            </button>
+                          )}
+                          {isSubscribed && (
+                            <button
+                              onClick={() =>
+                                handleCancelSubscribePlanClick(plan)
+                              }
+                              className="p-2 rounded-md border-2 border-orange-400 text-red-500 text-md font-bold"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     );
                   })}
                 </div>

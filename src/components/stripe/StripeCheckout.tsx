@@ -3,7 +3,7 @@ import { useSupabase } from "../../contexts/SupabaseContext";
 interface StripeCheckoutModalProps {
   priceId: string | undefined;
   trialDays: number | undefined;
-  promoCode:boolean;
+  promoCode:boolean|undefined;
   onClose: () => void;
 }
 export default function StripeCheckoutModal({

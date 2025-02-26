@@ -63,8 +63,7 @@ serve(async (req) => {
 
     // Retrieve active subscription for the customer
     const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
+      customer: customerId
     });
 
     if (subscriptions.data.length === 0) {

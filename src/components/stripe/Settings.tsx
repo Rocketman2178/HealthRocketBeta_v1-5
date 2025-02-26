@@ -8,38 +8,38 @@ const Settings = () => {
   const sessionId = searchParams.get("session_id");
   const [message, setMessage] = useState<string>("Checking subscription...");
   const navigate = useNavigate();
-  useEffect(() => {
-    const verifySubscription = async () => {
-      if (!sessionId) {
-        setMessage("No session found.");
-        return;
-      }
-      try {
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_SUPABASE_URL
-          }/functions/v1/verify-session?session_id=${sessionId}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data: { status?: string } = await response.json();
-
-        if (response.ok && data.status === "complete") {
-          setMessage("🎉 Subscription successful! Thank you for subscribing.");
-        } else {
-          setMessage(
-            "⚠️ Subscription could not be verified. Please contact support."
-          );
+  const verifySubscription = async () => {
+    if (!sessionId) {
+      setMessage("No session found.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_SUPABASE_URL
+        }/functions/v1/verify-session?session_id=${sessionId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        setMessage("❌ Error verifying subscription. Try again later.");
+      );
+      const data: { status?: string } = await response.json();
+
+      if (response.ok && data.status === "complete") {
+        setMessage("🎉 Subscription successful! Thank you for subscribing.");
+      } else {
+        setMessage(
+          "⚠️ Subscription could not be verified. Please contact support."
+        );
       }
-    };
+    } catch (error) {
+      setMessage("❌ Error verifying subscription. Try again later.");
+    }
+  };
+  useEffect(() => {
     verifySubscription();
   }, []);
 

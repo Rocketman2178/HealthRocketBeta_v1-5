@@ -45,15 +45,13 @@ serve(async (req) => {
       throw new Error('No active subscription found')
     }
 
-    // Cancel at period end
-    await stripe.subscriptions.update(subscription.stripe_subscription_id, {
-      cancel_at_period_end: true,
-    })
+    await stripe.subscriptions.cancel(subscription.stripe_subscription_id)
 
-    // Update subscription in database
+    // Update subscription status in database
     await supabase
       .from('subscriptions')
-      .update({ cancel_at_period_end: true })
+      .delete()
+      .eq("stripe_subscription_id",subscription?.stripe_subscription_id)
       .eq('user_id', user.id)
 
     return new Response(

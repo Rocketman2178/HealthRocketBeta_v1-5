@@ -106,7 +106,6 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
       }
 
       const data = await response.json();
-
       setActiveSubscription(data[0]?.plan?.id);
       setLoadingActiveSubscriptions(false);
     } catch (err) {
@@ -181,13 +180,7 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
       console.error("Error canceling subscription:", err.message);
     }
   };
-  if (loadingActiveSubscriptions) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
-    );
-  }
+ 
   return (
     <>
       <div className="relative" ref={dropdownRef}>
@@ -229,6 +222,13 @@ export function SubscriptionPlan({ onOpenChange }: SubscriptionPlanProps) {
                   {plans.map((plan) => {
                     const Icon = plan.icon;
                     const isSubscribed = activeSubscription === plan.priceId;
+                    if (loadingActiveSubscriptions) {
+                      return (
+                        <div className="min-h-screen flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                        </div>
+                      );
+                    }
                     return (
                       <div
                         key={plan.name}

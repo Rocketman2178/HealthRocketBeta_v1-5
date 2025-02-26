@@ -58,8 +58,7 @@ serve(async (req) => {
 
     // Fetch active subscriptions from Stripe
     const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
+      customer: customerId
     });
 
     return new Response(JSON.stringify(subscriptions.data), {
